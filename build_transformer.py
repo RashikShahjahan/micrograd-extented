@@ -22,3 +22,5 @@ def build_transformer(src_vocab_size, tgt_vocab_size, src_seq_len, tgt_seq_len, 
     decoder = Decoder([decoder_block for _ in range(num_decoder_layers)])
     projection_layer = ProjectionLayer(d_model, tgt_vocab_size)
     return Transformer(encoder, decoder, src_embed, tgt_embed, src_pos, tgt_pos, projection_layer)
+
+print(build_transformer(10, 10, 10, 10, 512))
