@@ -6,3 +6,8 @@ class Module:
 
     def parameters(self):
         return []
+    
+    def to(self, device):
+        for p in self.parameters():
+            p.to(device)
+        return self
