@@ -10,8 +10,8 @@ from transformer import Transformer
 def build_transformer(src_vocab_size, tgt_vocab_size, src_seq_len, tgt_seq_len, d_model, nhead =8 , dim_feedforward = 2048, num_encoder_layers = 6, num_decoder_layers = 6, dropout = 0.1):
     src_embed = InputEmbedding(d_model, src_vocab_size)
     tgt_embed = InputEmbedding(d_model, tgt_vocab_size)
-    src_pos = PositionalEncoding(d_model, src_seq_len)
-    tgt_pos = PositionalEncoding(d_model, tgt_seq_len)
+    src_pos = PositionalEncoding(d_model, src_seq_len, dropout)
+    tgt_pos = PositionalEncoding(d_model, tgt_seq_len, dropout)
     multi_head_attn = MultiHeadAttentionBlock(d_model, nhead, dropout)
     feed_forward = FeedForwardBlock(d_model, dim_feedforward, dropout)
     encoder_block = EncoderBlock(multi_head_attn, feed_forward, dropout)
