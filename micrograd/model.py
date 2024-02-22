@@ -1,11 +1,11 @@
-from micrograd.embedding import InputEmbedding
-from micrograd.pos_encoding import PositionalEncoding
-from micrograd.multi_head_attention import MultiHeadAttentionBlock
-from micrograd.feedforward import FeedForward
-from micrograd.encoder import EncoderBlock, Encoder
-from micrograd.decoder import DecoderBlock, Decoder
-from micrograd.projection_layer import ProjectionLayer
-from micrograd.transformer import Transformer
+from embedding import InputEmbedding
+from pos_encoding import PositionalEncoding
+from multi_head_attention import MultiHeadAttentionBlock
+from feedforward import FeedForward
+from encoder import EncoderBlock, Encoder
+from decoder import DecoderBlock, Decoder
+from projection_layer import ProjectionLayer
+from transformer import Transformer
 
 def build_transformer(src_vocab_size, tgt_vocab_size, src_seq_len, tgt_seq_len, d_model, nhead, dim_feedforward, num_encoder_layers, num_decoder_layers, dropout):
     src_embed = InputEmbedding(d_model, src_vocab_size)
