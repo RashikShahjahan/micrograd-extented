@@ -1,16 +1,15 @@
-from micrograd.module import Module
-import numpy as np
-from micrograd.engine import Value
+import torch.nn as nn
+import torch
 
-class Dropout(Module):
+class Dropout(nn.Module):
     def __init__(self, dropout):
+        super().__init__()
+
         self.dropout = dropout
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.dropout == 1: 
-            return np.vectorize(Value)(np.zeros_like(x))
-        mask = np.vectorize(Value)(np.rand(x.shape) > self.dropout).float()
+            return torch.zeros_like(x)
+        mask = (torch.rand(x.shape) > self.dropout).float()
         return mask * x / (1.0 - self.dropout)
 
-    def __repr__(self):
-        return f"Dropout({self.dropout})"

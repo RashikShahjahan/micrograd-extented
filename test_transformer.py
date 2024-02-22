@@ -6,6 +6,8 @@ from micrograd.blocks.encoder import EncoderBlock, Encoder
 from micrograd.blocks.decoder import DecoderBlock, Decoder
 from micrograd.blocks.projection_layer import ProjectionLayer
 from micrograd.blocks.transformer import Transformer
+import torch
+import torch.nn as nn
 
 def build_transformer(src_vocab_size, tgt_vocab_size, src_seq_len, tgt_seq_len, d_model, nhead =8 , dim_feedforward = 2048, num_encoder_layers = 6, num_decoder_layers = 6, dropout = 0.1):
     src_embed = InputEmbedding(d_model, src_vocab_size)
@@ -23,4 +25,6 @@ def build_transformer(src_vocab_size, tgt_vocab_size, src_seq_len, tgt_seq_len, 
     projection_layer = ProjectionLayer(d_model, tgt_vocab_size)
     return Transformer(encoder, decoder, src_embed, tgt_embed, src_pos, tgt_pos, projection_layer)
 
-print(build_transformer(10, 10, 10, 10, 512))
+
+
+

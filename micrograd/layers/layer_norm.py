@@ -1,20 +1,15 @@
-from micrograd.module import Module
-import numpy as np
-from micrograd.engine import Value
+import torch.nn as nn
+import torch
 
-class LayerNorm(Module):
+class LayerNorm(nn.Module):
     def __init__(self, eps=1e-5):
-        self.eps = eps
-        self.alpha = np.vectorize(Value)(np.ones(1))
-        self.bias = np.vectorize(Value)(np.zeros(1))
+        super().__init__()
 
-    def __call__(self, x):
-        mean = np.mean(x, axis=-1, keepdims=True)
-        std = np.std(x, axis=-1, keepdims=True)
+        self.eps = eps
+        self.alpha = torch.ones(1)
+        self.bias = torch.zeros(1)
+
+    def forward(self, x):
+        mean = torch.mean(x, axis=-1, keepdims=True)
+        std = torch.std(x, axis=-1, keepdims=True)
         return self.alpha * (x - mean) / (std + self.eps) + self.bias
-    
-    def parameters(self):
-        return [self.alpha, self.bias]
-    
-    def __repr__(self):
-        return f"LayerNorm({self.alpha},{self.bias})"

@@ -1,10 +1,13 @@
-from micrograd.module import Module
+import torch.nn as nn
+import torch
+import math
 from micrograd.layers.linear import Linear
 from micrograd.layers.dropout import Dropout
-import numpy as np
+from micrograd.layers.softmax import Softmax
 
-class MultiHeadAttentionBlock(Module):
+class MultiHeadAttentionBlock(nn.Module):
     def __init__(self, d_model, n_heads, dropout):
+        super().__init__()
         self.n_heads = n_heads
         self.d_model = d_model
         self.d_k = d_model // n_heads
@@ -17,19 +20,17 @@ class MultiHeadAttentionBlock(Module):
 
     @staticmethod
     def attention(q, k, v, mask=None, dropout=None):
-        d_k = q.shape[-1]
-        scores = np.matmul(q, k.transpose(-2, -1)) / np.sqrt(d_k)
-        if mask:
+        scores = torch.matmul(q, k.transpose(-2, -1)) /  math.sqrt(q.size(-1))
+        if mask is not None:
             scores = scores.masked_fill(mask == 0, -1e9)
-        scores = scores.softmax(-1)
+        scores = Softmax()(scores)
         if dropout:
             scores = dropout(scores)
-        output = np.matmul(scores, v), scores
-        return output
-
+        output = torch.matmul(scores, v)
+        return output, scores
 
     
-    def __call__(self, q, k, v, mask=None):
+    def forward(self, q, k, v, mask=None):
         bs = q.shape[0]
         q = self.q_linear(q).reshape(bs, -1, self.n_heads, self.d_k)
         k = self.k_linear(k).reshape(bs, -1, self.n_heads, self.d_k)
@@ -41,8 +42,7 @@ class MultiHeadAttentionBlock(Module):
         x = x.transpose(1, 2).reshape(bs, -1, self.d_model)
         return self.out(x)
     
-    def parameters(self):
-        return self.q_linear.parameters() + self.k_linear.parameters() + self.v_linear.parameters() + self.out.parameters()
+    def parameters(self, recurse):
+        return super().parameters(recurse)
+        
     
-    def __repr__(self):
-        return f"MultiHeadAttentionBlock({self.q_linear},{self.k_linear},{self.v_linear},{self.out},{self.dropout})"

@@ -1,7 +1,8 @@
-from micrograd.module import Module
+import torch.nn as nn
 
-class Transformer(Module):
+class Transformer(nn.Module):
     def __init__(self, encoder, decoder, src_embed, tgt_embed, src_pos, tgt_pos, projection_layer):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
         self.src_embed = src_embed
@@ -23,10 +24,10 @@ class Transformer(Module):
     def project(self, x):
         return self.projection_layer(x)
 
+    def forward(self, src, tgt, src_mask, tgt_mask):
+        return self.project(self.decode(tgt, self.encode(src, src_mask), src_mask, tgt_mask))
+    
     def parameters(self):
-        return self.encoder.parameters() + self.decoder.parameters() + self.src_embed.parameters() + self.tgt_embed.parameters() + self.src_pos.parameters() + self.tgt_pos.parameters() + self.projection_layer.parameters()
-    
-    def __repr__(self):
-        return f"Transformer({self.encoder},{self.decoder},{self.src_embed},{self.tgt_embed},{self.src_pos},{self.tgt_pos},{self.projection_layer})"
-    
-
+        params = self.encoder.parameters()+ list(self.decoder.parameters(True))+self.src_embed.parameters()+self.tgt_embed.parameters()+self.projection_layer.parameters()
+        print(f'Transformer{list(params)}')
+        return params

@@ -1,19 +1,17 @@
-from micrograd.module import Module
-import numpy as np
-from micrograd.engine import Value
-import random
+import torch.nn as nn
+import torch
 
-class Linear(Module):
+class Linear(nn.Module):
     def __init__(self, x_len, y_len):
-        self.W = np.array([[Value(random.uniform(-1,1)) for _ in range(x_len)] for _ in range(y_len)])
-        self.b = np.array([Value(0) for _ in range(y_len)])
+        super().__init__()
+
+        self.w = torch.rand(x_len,y_len)
+        self.b = torch.zeros(y_len)
 
 
-    def __call__(self, x):
+    def forward(self, x):
         y = self.w @ x + self.b
+        return y
     
     def parameters(self):
-        return [self.W, self.b]
-    
-    def __repr__(self):
-        return f"Linear({self.W.shape[1]}, {self.W.shape[0]})"
+        return [self.w, self.b]
