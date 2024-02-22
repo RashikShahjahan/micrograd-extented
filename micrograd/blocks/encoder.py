@@ -1,6 +1,6 @@
-from module import Module
-from layer_norm import LayerNorm
-from residual import ResidualConnection
+from micrograd.module import Module
+from micrograd.layers.layer_norm import LayerNorm
+from micrograd.blocks.residual import ResidualConnection
 
 
 class EncoderBlock(Module):

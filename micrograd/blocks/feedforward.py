@@ -1,6 +1,6 @@
-from module import Module
-from linear import Linear
-from dropout import Dropout
+from micrograd.module import Module
+from micrograd.layers.linear import Linear
+from micrograd.layers.dropout import Dropout
 import numpy as np
 
 class FeedForwardBlock(Module):

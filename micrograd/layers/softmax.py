@@ -1,4 +1,4 @@
-from module import Module
+from micrograd.module import Module
 
 class Softmax(Module):
     def __call__(self, x):

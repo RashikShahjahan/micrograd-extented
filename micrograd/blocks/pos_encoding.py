@@ -1,5 +1,5 @@
-from dropout import Dropout
-from module import Module
+from micrograd.layers.dropout import Dropout
+from micrograd.module import Module
 import numpy as np
 
 

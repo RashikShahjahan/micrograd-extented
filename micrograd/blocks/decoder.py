@@ -1,6 +1,6 @@
-from module import Module
-from residual import ResidualConnection
-from layer_norm import LayerNorm
+from micrograd.module import Module
+from micrograd.blocks.residual import ResidualConnection
+from micrograd.layers.layer_norm import LayerNorm
 
 class DecoderBlock(Module):
     def __init__(self, self_attn, cross_attn, feed_forward, dropout):

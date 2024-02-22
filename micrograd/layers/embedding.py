@@ -1,5 +1,5 @@
-from module import Module
-from engine import Value
+from micrograd.module import Module
+from micrograd.engine import Value
 import random
 import math
 import numpy as np

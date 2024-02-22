@@ -1,6 +1,6 @@
-from module import Module
-from dropout import Dropout
-from layer_norm import LayerNorm
+from micrograd.module import Module
+from micrograd.layers.dropout import Dropout
+from micrograd.layers.layer_norm import LayerNorm
 
 class ResidualConnection(Module):
     def __init__(self, dropout):

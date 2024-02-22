@@ -1,6 +1,6 @@
-from module import Module
+from micrograd.module import Module
 import numpy as np
-from engine import Value
+from micrograd.engine import Value
 
 class Dropout(Module):
     def __init__(self, dropout):

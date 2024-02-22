@@ -1,6 +1,6 @@
-from module import Module
-from linear import Linear
-from softmax import Softmax
+from micrograd.module import Module
+from micrograd.layers.linear import Linear
+from micrograd.layers.softmax import Softmax
 
 class ProjectionLayer(Module):
     def __init__(self, d_model, d_vocab):

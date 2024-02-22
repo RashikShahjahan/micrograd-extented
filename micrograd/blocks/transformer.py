@@ -1,4 +1,4 @@
-from module import Module
+from micrograd.module import Module
 
 class Transformer(Module):
     def __init__(self, encoder, decoder, src_embed, tgt_embed, src_pos, tgt_pos, projection_layer):

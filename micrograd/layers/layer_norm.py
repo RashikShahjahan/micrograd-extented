@@ -1,6 +1,6 @@
-from module import Module
+from micrograd.module import Module
 import numpy as np
-from engine import Value
+from micrograd.engine import Value
 
 class LayerNorm(Module):
     def __init__(self, eps=1e-5):
@@ -14,7 +14,7 @@ class LayerNorm(Module):
         return self.alpha * (x - mean) / (std + self.eps) + self.bias
     
     def parameters(self):
-        return self.alpha, self.bias
+        return [self.alpha, self.bias]
     
     def __repr__(self):
         return f"LayerNorm({self.alpha},{self.bias})"
