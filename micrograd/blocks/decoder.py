@@ -3,14 +3,14 @@ from micrograd.blocks.residual import ResidualConnection
 from micrograd.layers.layer_norm import LayerNorm
 
 class DecoderBlock(nn.Module):
-    def __init__(self, self_attn, cross_attn, feed_forward, dropout):
+    def __init__(self,features, self_attn, cross_attn, feed_forward, dropout):
         super().__init__()
         self.self_attn = self_attn
         self.cross_attn = cross_attn
         self.feed_forward = feed_forward
-        self.residual1 = ResidualConnection(dropout)
-        self.residual2 = ResidualConnection(dropout)
-        self.residual3 = ResidualConnection(dropout)
+        self.residual1 = ResidualConnection(features,dropout)
+        self.residual2 = ResidualConnection(features,dropout)
+        self.residual3 = ResidualConnection(features,dropout)
 
     def forward(self, x, enc_output, src_mask, tgt_mask):
         x = self.residual1(x, lambda x: self.self_attn(x, x, x, tgt_mask))
@@ -24,10 +24,10 @@ class DecoderBlock(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, layers):
+    def __init__(self, features, layers):
         super().__init__()
         self.layers = layers
-        self.norm = LayerNorm()
+        self.norm = LayerNorm(features)
 
     def forward(self, x, enc_output, src_mask, tgt_mask):
         for layer in self.layers:
