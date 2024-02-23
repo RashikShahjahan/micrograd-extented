@@ -9,7 +9,7 @@ class Embedding(nn.Module):
         self.weight = torch.rand(d_model,vocab_size).to('cuda' if torch.cuda.is_available() else 'cpu')
 
     def forward(self, x):
-        return self.weight @ x
+        return self.weight[x]
     
     def parameters(self):
         return [self.weight]
