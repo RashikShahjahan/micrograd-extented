@@ -4,7 +4,7 @@ import torch
 
 
 class Embedding(nn.Module):
-    def __init__(self, d_model, vocab_size):
+    def __init__(self, vocab_size, d_model):
         super().__init__()
         self.weight = torch.rand(d_model,vocab_size).to('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -21,7 +21,7 @@ class InputEmbedding(nn.Module):
         super().__init__()
         self.d_model = d_model
         self.vocab_size = vocab_size
-        self.embedding = Embedding(d_model,vocab_size)
+        self.embedding = Embedding(vocab_size,d_model)
 
     def forward(self,x):
         return self.embedding(x) * math.sqrt(self.d_model)
