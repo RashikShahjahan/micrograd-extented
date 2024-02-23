@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch
 
 from micrograd.layers.linear import Linear
 from micrograd.layers.softmax import Softmax

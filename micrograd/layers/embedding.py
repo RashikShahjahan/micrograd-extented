@@ -6,7 +6,7 @@ import torch
 class Embedding(nn.Module):
     def __init__(self, vocab_size, d_model):
         super().__init__()
-        self.weight = torch.rand(d_model,vocab_size).to('cuda' if torch.cuda.is_available() else 'cpu')
+        self.weight = torch.rand(vocab_size,d_model).to('cuda' if torch.cuda.is_available() else 'cpu')
 
     def forward(self, x):
         return self.weight[x]
