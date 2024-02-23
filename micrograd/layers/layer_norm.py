@@ -6,8 +6,8 @@ class LayerNorm(nn.Module):
         super().__init__()
 
         self.eps = eps
-        self.alpha = torch.ones(1)
-        self.bias = torch.zeros(1)
+        self.alpha = torch.ones(1).to('cuda' if torch.cuda.is_available() else 'cpu')
+        self.bias = torch.zeros(1).to('cuda' if torch.cuda.is_available() else 'cpu')
 
     def forward(self, x):
         mean = torch.mean(x, axis=-1, keepdims=True)

@@ -5,8 +5,8 @@ class Linear(nn.Module):
     def __init__(self, x_len, y_len):
         super().__init__()
 
-        self.w = torch.rand(x_len,y_len)
-        self.b = torch.zeros(y_len)
+        self.w = torch.rand(x_len,y_len).to('cuda' if torch.cuda.is_available() else 'cpu')
+        self.b = torch.zeros(y_len).to('cuda' if torch.cuda.is_available() else 'cpu')
 
 
     def forward(self, x):
