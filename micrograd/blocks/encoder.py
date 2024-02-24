@@ -6,17 +6,14 @@ from micrograd.blocks.residual import ResidualConnection
 class EncoderBlock(nn.Module):
     def __init__(self, features, self_attn, feed_forward, dropout):
         super().__init__()
-        self.self_attn = self_attn
-        self.feed_forward = feed_forward
-        self.residual1 = ResidualConnection(features,dropout)
-        self.residual2 = ResidualConnection(features,dropout)
-    
-    def forward(self, x, mask):
-        x = self.residual1(x, lambda x: self.self_attn(x, x, x, mask))
-        return self.residual2(x, self.feed_forward)
-    
-    def parameters(self):
-        return list(self.feed_forward.parameters()) + list(self.self_attn.parameters(True))
+        self.self_attention_block = self_attn
+        self.feed_forward_block = feed_forward
+        self.residual_connections = nn.ModuleList([ResidualConnection(features, dropout) for _ in range(2)])
+
+    def forward(self, x, src_mask):
+        x = self.residual_connections[0](x, lambda x: self.self_attention_block(x, x, x, src_mask))
+        x = self.residual_connections[1](x, self.feed_forward_block)
+        return x
     
 
  
@@ -31,8 +28,7 @@ class Encoder(nn.Module):
             x = layer(x, mask)
         return self.norm(x)
     
-    def parameters(self):
-        return [param for layer in self.layers for param in layer.parameters()]
+
     
 
     

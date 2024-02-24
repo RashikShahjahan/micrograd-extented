@@ -14,7 +14,5 @@ class FeedForwardBlock(nn.Module):
     def forward(self, x):
         return self.linear2(self.dropout(self.relu(self.linear1(x))))
     
-    def parameters(self):
-        return self.linear1.parameters() + self.linear2.parameters()
-    
+
 

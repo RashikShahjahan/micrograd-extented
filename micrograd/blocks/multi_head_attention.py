@@ -1,48 +1,68 @@
 import torch.nn as nn
-import torch
 import math
 from micrograd.layers.linear import Linear
 from micrograd.layers.dropout import Dropout
 from micrograd.layers.softmax import Softmax
 
+
 class MultiHeadAttentionBlock(nn.Module):
-    def __init__(self, d_model, n_heads, dropout):
+
+    def __init__(self,d_model, h, dropout):
         super().__init__()
-        self.n_heads = n_heads
-        self.d_model = d_model
-        self.d_k = d_model // n_heads
-        self.dropout = dropout
-        self.q_linear = Linear(d_model, d_model)
-        self.v_linear = Linear(d_model, d_model)
-        self.k_linear = Linear(d_model, d_model)
-        self.out = Linear(d_model, d_model)
+        self.d_model = d_model # Embedding vector size
+        self.h = h # Number of heads
+        # Make sure d_model is divisible by h
+        assert d_model % h == 0, "d_model is not divisible by h"
+
+        self.d_k = d_model // h # Dimension of vector seen by each head
+        self.w_q = Linear(d_model, d_model, bias=False) # Wq
+        self.w_k = Linear(d_model, d_model, bias=False) # Wk
+        self.w_v = Linear(d_model, d_model, bias=False) # Wv
+        self.w_o = Linear(d_model, d_model, bias=False) # Wo
         self.dropout = Dropout(dropout)
+        self.softmax = Softmax()
 
     @staticmethod
-    def attention(q, k, v, mask=None, dropout=None):
-        scores = torch.matmul(q, k.transpose(-2, -1)) /  math.sqrt(q.size(-1))
+    def attention(query, key, value, mask, dropout, softmax):
+        d_k = query.shape[-1]
+        # Just apply the formula from the paper
+        # (batch, h, seq_len, d_k) --> (batch, h, seq_len, seq_len)
+        attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, -1e9)
-        scores = Softmax()(scores)
-        if dropout:
-            scores = dropout(scores)
-        output = torch.matmul(scores, v)
-        return output, scores
+            # Write a very low value (indicating -inf) to the positions where mask == 0
+            attention_scores.masked_fill_(mask == 0, -1e9)
+        attention_scores = softmax(attention_scores) # (batch, h, seq_len, seq_len) # Apply softmax
+        if dropout is not None:
+            attention_scores = dropout(attention_scores)
+        # (batch, h, seq_len, seq_len) --> (batch, h, seq_len, d_k)
+        # return attention scores which can be used for visualization
+        return (attention_scores @ value), attention_scores
 
-    
-    def forward(self, q, k, v, mask=None):
-        bs = q.shape[0]
-        q = self.q_linear(q).reshape(bs, -1, self.n_heads, self.d_k)
-        k = self.k_linear(k).reshape(bs, -1, self.n_heads, self.d_k)
-        v = self.v_linear(v).reshape(bs, -1, self.n_heads, self.d_k)
-        q = q.transpose(1, 2)
-        k = k.transpose(1, 2)
-        v = v.transpose(1, 2)
-        x, self.scores = MultiHeadAttentionBlock.attention(q, k, v, mask, self.dropout)
-        x = x.transpose(1, 2).reshape(bs, -1, self.d_model)
-        return self.out(x)
-    
-    def parameters(self, recurse):
-        return super().parameters(recurse)
+    def forward(self, q, k, v, mask):
+        query = self.w_q(q) # (batch, seq_len, d_model) --> (batch, seq_len, d_model)
+        key = self.w_k(k) # (batch, seq_len, d_model) --> (batch, seq_len, d_model)
+        value = self.w_v(v) # (batch, seq_len, d_model) --> (batch, seq_len, d_model)
+        print(f'query: {query.shape}')
+        print(f'key: {key.shape}')
+        print(f'value: {value.shape}')
+        # (batch, seq_len, d_model) --> (batch, seq_len, h, d_k) --> (batch, h, seq_len, d_k)
+        query = query.view(query.shape[0], query.shape[1], self.h, self.d_k).transpose(1, 2)
+        print(f'query: {query.shape}')
+
+        key = key.view(key.shape[0], key.shape[1], self.h, self.d_k).transpose(1, 2)
+        print(f'key: {key.shape}')
+        value = value.view(value.shape[0], value.shape[1], self.h, self.d_k).transpose(1, 2)
+        print(f'value: {value.shape}')
+
+        # Calculate attention
+        x, self.attention_scores = MultiHeadAttentionBlock.attention(query, key, value, mask, self.dropout, self.softmax)
         
+        # Combine all the heads together
+        # (batch, h, seq_len, d_k) --> (batch, seq_len, h, d_k) --> (batch, seq_len, d_model)
+        x = x.transpose(1, 2).contiguous().view(x.shape[0], -1, self.h * self.d_k)
+
+        # Multiply by Wo
+        # (batch, seq_len, d_model) --> (batch, seq_len, d_model)  
+        return self.w_o(x)
+
     

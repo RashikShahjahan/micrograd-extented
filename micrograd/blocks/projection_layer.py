@@ -12,5 +12,3 @@ class ProjectionLayer(nn.Module):
     def forward(self, x):
         return self.softmax(self.linear(x))
 
-    def parameters(self):
-        return self.linear.parameters()

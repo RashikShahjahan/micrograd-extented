@@ -13,3 +13,9 @@ class LayerNorm(nn.Module):
         mean = torch.mean(x, axis=-1, keepdims=True)
         std = torch.std(x, axis=-1, keepdims=True)
         return self.alpha * (x - mean) / (std + self.eps) + self.bias
+    
+    def parameters(self):
+        return [self.alpha, self.bias]
+    
+    def __repr__(self):
+        return f"LayerNorm({self.alpha.shape})"

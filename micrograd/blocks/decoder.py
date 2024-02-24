@@ -8,19 +8,14 @@ class DecoderBlock(nn.Module):
         self.self_attn = self_attn
         self.cross_attn = cross_attn
         self.feed_forward = feed_forward
-        self.residual1 = ResidualConnection(features,dropout)
-        self.residual2 = ResidualConnection(features,dropout)
-        self.residual3 = ResidualConnection(features,dropout)
+        self.residual_connections = nn.ModuleList([ResidualConnection(features, dropout) for _ in range(3)])
 
-    def forward(self, x, enc_output, src_mask, tgt_mask):
-        x = self.residual1(x, lambda x: self.self_attn(x, x, x, tgt_mask))
-        x = self.residual2(x, lambda x: self.cross_attn(x, enc_output, enc_output, src_mask))
-        return self.residual3(x, self.feed_forward)
-    
-    def parameters(self, recurse):
-        params = list(self.self_attn.parameters(recurse)) + list(self.cross_attn.parameters(recurse)) + self.feed_forward.parameters()
-        return params
-    
+    def forward(self, x, encoder_output, src_mask, tgt_mask):
+        x = self.residual_connections[0](x, lambda x: self.self_attn(x, x, x, tgt_mask))
+        x = self.residual_connections[1](x, lambda x: self.cross_attn(x, encoder_output, encoder_output, src_mask))
+        x = self.residual_connections[2](x, self.feed_forward)
+        return x
+
 
 
 class Decoder(nn.Module):
@@ -34,5 +29,4 @@ class Decoder(nn.Module):
             x = layer(x, enc_output, src_mask, tgt_mask)
         return self.norm(x)
     
-    def parameters(self, recurse):
-        return [param for layer in self.layers for param in layer.parameters(recurse)]
+
