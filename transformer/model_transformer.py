@@ -2,10 +2,8 @@ from micrograd.layers.embedding import InputEmbedding
 from micrograd.blocks.pos_encoding import PositionalEncoding
 from micrograd.blocks.multi_head_attention import MultiHeadAttentionBlock
 from micrograd.blocks.feedforward import FeedForwardBlock
-from micrograd.blocks.encoder import EncoderBlock, Encoder
-from micrograd.blocks.decoder import DecoderBlock, Decoder
 from micrograd.blocks.projection_layer import ProjectionLayer
-from micrograd.blocks.transformer import Transformer
+from micrograd.models.transformer import Transformer, Encoder, Decoder, EncoderBlock, DecoderBlock
 from torch import nn
 
 
